@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block main_title %}{% endblock %}
+{% block sub_title %}{% endblock %}
+    {% block content%}
+    {% if user.is_authenticated %}
+    
+    {% else %} 
+    <article class="message is-link">
+        <div class="message-body">
+            <h1 class='is-size-2'>Please log in or register to view or start tracking your kidney health metrics</h1>
+        </div>
+    </article>
+</br>
+    <div class="card">
+        <div class="card-content">
+          <p class="title">
+            "Individuals with kidney disease who are able to obtain treatment early experience a higher quality of life and are able to maintain more of their day-to-day activites, including keeping their jobs."
+          </p>
+          <p class="subtitle">
+            Xavier Becerra
+          </p>
+        </div>
+      </div>
+    
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block main_title %}    {% endblock %}
+{% block sub_title %}{% endblock %}
+{% block content%}
+<div class="columns">
+   
+    <div class="column is-one-third">
+        <canvas id="myChart"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        //global list of the foods added to meal
+        let arrayOfFoods = [];
+        let arrayCounter = 0;
+
+        const ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+        datasets: [
+            {
+            backgroundColor: ['#ed181f', '#636262'], //[done, left] RED
+            label: 'Sodium',
+            data: [{{sodiumDone}}, {{sodiumLeft}}]
+            },
+            {
+            backgroundColor: ['#ffb319', '#636262'], // ORANGE
+            label: 'Protein',
+            data: [{{proteinDone}}, {{proteinLeft}}]
+            },
+            {
+            backgroundColor: ['#4fed11', '#636262'], // Green
+            label: 'Water',
+            data: [{{waterDone}}, {{waterLeft}}]
+
+            },
+            {
+            backgroundColor: ['#1b18ed', '#636262'], // BLUE
+            label: 'Potassium',
+            data: [{{potassiumDone}}, {{potassiumLeft}}]
+            },
+            {
+            backgroundColor: ['#871aed', '#636262'], //PURPLE
+            label: 'Phosphates',
+            data: [{{phosphatesDone}}, {{phosphatesLeft}}]
+            }
+        ]
+        },
+        });
+
+        function openMealModalHandler(){
+            arrayOfFoods = [];
+            arrayCounter = 0;
+            document.getElementById('foodresults').innerHTML = "";
+            document.getElementById('foodlist').innerHTML = "";
+            document.getElementById('mealmodal').classList.add('is-active');
+        }
+
+        function closeMealModalHandler(){
+            document.getElementById('mealmodal').classList.remove('is-active');
+        }
+
+        function openHistoryModalHandler(){
+            document.getElementById('historymodal').classList.add('is-active');
+        }
+
+        function closeHistoryModalHandler(){
+            document.getElementById('historymodal').classList.remove('is-active');
+        }
+
+
+        function buildTable2(data){
+            console.log(arrayOfFoods)
+            var table = document.getElementById('foodlist');
+            var row = 
+            `<tr>
+                <td>${data.description}<br/><p class='is-size-7 has-text-grey'>${data.brandName}</p></td>
+            </tr>`
+            table.innerHTML += row
+
+            var submitTable = document.getElementById('selectedFoods');
+
+            var row = `<input type=checkbox checked value=${arrayOfFoods[arrayCounter]} name='selectedFoods' style='display:none'></input>`
+            submitTable.innerHTML += row
+            arrayCounter += 1
+        }
+
+        function addtolist(data){
+            currElement = document.getElementById(data).value;
+            arrayOfFoods.push(currElement);
+            fetch(`https://api.nal.usda.gov/fdc/v1/food/${currElement}?nutrients=203&nutrients=204&nutrients=205&api_key=qYgvm24Uuid52ZmJ6cM3wfhgbeWH33cYhssaUW5O`)
+            .then(response => response.json())
+            .then(data => buildTable2(data))
+        }
+        function buildTable(data){
+            var table = document.getElementById('foodresults');
+            table.innerHTML = ""
+            for (var i = 0; i < data.length; i++){
+                currValue = ""
+                currValue += data[i].fdcId
+                var row =
+                `<tr>
+                    <td>${data[i].lowercaseDescription}<p class='is-size-7 has-text-grey'>${data[i].brandName}</p></td>
+                    <td class="has-text-right"><a class="button is-link" onclick=addtolist(${i})>Add</a></td>
+                    <td><input type='hidden' id='${i}' value=${currValue}></td>
+                </tr>`
+                table.innerHTML += row
+            }
+        }
+        function getFoods(){
+            item = document.getElementById('foodItem').value;
+            fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${item}&dataType=&pageSize=5&sortBy=dataType.keyword&sortOrder=asc&api_key=qYgvm24Uuid52ZmJ6cM3wfhgbeWH33cYhssaUW5O`)
+            .then(response => response.json())
+            .then(data => buildTable(data.foods))
+        }
+
+    </script>
+
+    <div class="column is-two-thirds">
+        <article class="message is-success">
+            <div class="message-header">
+              <p>{% for i in currUser %}{{i.first_name}}{%endfor%}'s Breakdown</p>
+            </div>
+            <div class="message-body">
+                {% if sodiumExceed == 1 and proteinExceed == 1 and waterExceed == 1 and potassiumExceed == 1 and phosphatesExceed == 1%}
+                <h1 class="has-text-left">It looks like you are almost done with your goals! You need more of the following:</h1>
+                {% else %}
+                <h1 class="has-text-left">It looks like you are met or exceeded your goals!</h1>
+                {% endif %}
+            </br>
+                <ul class="has-text-left">
+
+                    {%if sodiumExceed == 1 %}
+                    <li><strong>Sodium</strong></li>
+                    {% else %}
+                    <script>
+                        // alert('Warning Sodium Daily Value Exceeded')
+                    </script>
+                    {% endif %}
+
+                    {%if proteinExceed == 1 %}
+                    <li><strong>Protein</strong></li>
+                    {% else %}
+                    <script>
+                        // alert('Warning Protein Daily Value Exceeded')
+                    </script>
+                    {% endif %}
+
+                    {% if waterExceed == 1 %}
+                    <li><strong>Water</strong></li>
+                    {% else %}
+                    <script>
+                        // alert('Warning Water Daily Value Exceeded')
+                    </script>
+                    {% endif %}
+
+                    {% if potassiumExceed == 1 %}
+                    <li><strong>Potassium</strong></li>
+                    {% else %}
+                    <script>
+                        // alert('Warning Potassium Daily Value Exceeded')
+                    </script>
+                    {% endif %}
+
+                    {% if phosphatesExceed == 1 %}
+                    <li><strong>Phosphates</strong></li>
+                    {% else %}
+                    <script>
+                        // alert('Warning Phosphates Daily Value Exceeded')
+                    </script>
+                    {% endif %}
+                </ul>
+            </div>
+          </article>
+    <div class="has-text-right">
+        <a class="button is-link" onclick=openMealModalHandler()>Add a Meal</a>
+        <a class="button is-link" onclick=openHistoryModalHandler()>View Meal History</a>
+    </div>
+      
+    </div>
+  </div>
+
+<div class='columns'>
+    <div class="column is-two-thirds">
+        <h1 class='is-size-2 has-text-left'>Micronutrition Progress</h1>
+        <article class="message">
+            <div class="message-body has-text-left">
+                <p class='is-size-4'>Sodium</p>
+                <progress class="progress" value={{sodiumSum}} max={{sodiumRec}} >15%</progress>
+                <p class='is-size-4'>Protein</p>
+                <progress class="progress is-primary" value={{proteinSum}} max={{proteinRec}}>15%</progress>
+                <p class='is-size-4'>Water</p>
+                <progress class="progress is-link" value={{waterSum}} max={{waterRec}}>30%</progress>
+                <p class='is-size-4'>Potassium</p>
+                <progress class="progress is-success" value={{potassiumSum}} max={{potassiumRec}}>60%</progress>
+                <p class='is-size-4'>Phosphates</p>
+                <progress class="progress is-warning" value={{phosphorusSum}} max={{phosphatesRec}}>75%</progress>
+            </div>
+        </article>
+    </div>
+
+    <div class='column is-one-third'>
+        <h1 class='is-size-2 has-text-right'>Today's Meals</h1>
+        <article class="message is-success">
+            <div class="message-body has-text-left">
+                {% for mealList in mealToday %}
+                <strong>{{mealList.0}}</strong>
+                <br>
+                <ul>
+                  {% for foodItem in mealList.1 %}
+                  <li class='ml-5'>{{foodItem}}</li>
+                  {% endfor %}
+                </ul>
+              {%endfor%}
+                <br>
+            </div>
+        </article>
+
+    </div>
+</div>
+
+<div class='modal has-text-left' id='mealmodal'>
+    <div class='modal-background'></div>
+    <div class='modal-content'>
+        <article class='message is-success'>
+            <div class='message-header'>
+              <p>My Meal</p>
+            </div>
+            <!-- MEAL INPUT FORM -->
+            <div class='message-body'>
+                <h1 class='has-text-left'>Track what you ate below:</h1><br/>
+                <form name="form" method="post" action="{% url "storemealView" %}">
+                    {% csrf_token %}
+                    <div class="columns">
+                        <div class="field column is-one-half">
+                            <label for="mealType"  class="label">Meal Type:</label>
+                            <div class='control'>
+                                <div class='select'>
+                                    <select name='mealType' required>
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="Dinner">Dinner</option>
+                                        <option value="Lunch">Lunch</option>
+                                        <option value="Snack">Snack</option>
+                                        <option value="Water">Water</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='field column is-one-half'>
+                            <label for='date'  class='label'>Date:</label>
+                            <div class="control">
+                                <input class='input' type='date' name='date' id='date' required onload=getDate()>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for='notes'  class="label">Notes:</label>
+                        <div class="control">
+                            <input type='text' name='notes' id='notes' required class='input'>
+                        </div>
+                    </div>
+                    <div class="field">
+                            <label for='foodItems'  class="label">Search Food:</label>
+                            <div class="control columns">
+                                <div class="column is-three-fifths">
+                                    <input type='text' name='foodItem' id='foodItem' class='input' >
+                                </div>
+                                <div class="column is-one-fifth">
+                                    <a class="button is-link" onclick=getFoods()>Find Food Item</a>
+                                </div>
+                            </div>
+                    </div>
+                    <table class="table has-text-left is-fullwidth" id="foodresults" ></table>
+                    <h1 class="label">Added Foods</h1>
+                    <table class="table has-text-left is-fullwidth" id="foodlist" ></table>
+                    <br>
+                    <div id="selectedFoods"></div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type='submit' class="button is-link">Submit</button>
+                        </div>
+                        <div class="control">
+                            <a class="button is-link is-light" onclick=closeMealModalHandler()>Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </br>
+            </div>
+          </article>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick=closeMealModalHandler()></button>
+</div>
+
+
+<div class="modal" id="historymodal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <article class="message is-primary">
+            <div class="message-header">
+              <p>Meal History</p>
+              <a class="delete" aria-label="delete" onclick=closeHistoryModalHandler()></a>
+            </div>
+            <div class="message-body">
+              {% for mealList in mealHistory %}
+              <strong>{{mealList.0}}</strong>
+              <br>
+              <ul>
+                {% for foodItem in mealList.1 %}
+                <li>{{foodItem}}</li>
+                {% endfor %}
+              </ul>
+              {%endfor%}
+              <br>
+            </div>
+          </article>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick=closeHistoryModalHandler()></button>
+</div>
+
+{% endblock %}

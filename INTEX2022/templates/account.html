@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Account{% endblock %}
+{% block main_title %}{% endblock %}
+{% block registerform %}
+{% if user.is_authenticated %}
+<div >
+    <h1 class="is-size-2">Please fill in your personal information</h1>
+</div>
+
+<form name='form' method='post' action="{% url 'storeuser' %}">
+    {% csrf_token %}
+
+    <div class="field">
+        <label for='first_name'  class="label">First Name:</label>
+        <div class="control">
+            <input class='input' type='text' name='first_name' id='first_name' required>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for='last_name'  class="label">Last Name:</label>
+        <div class="control">
+            <input type='text' name='last_name' id='last_name' required class='input'>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for='age' class='label'>Age:</label>
+        <div class="control">
+            <input type='number' name='age' id='age' required class='input'>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for='sex'  class="label">Sex:</label>
+        <div class="control">
+            <label class="radio">
+                <input type="radio" name="sex" value='Male'>
+                Male
+            </label>
+            <label class="radio">
+                <input type="radio" name="sex" value='Female'>
+                Female
+            </label>
+            <label class="radio">
+                <input type="radio" name="sex" value='Other'>
+                Other
+            </label>
+        </div>
+    </div>
+
+
+    <div class="field">
+        <label for='height' class='label'>Height:</label>
+        <div class="control">
+            <input type='number' name='height' id='height' required class='input'>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for='weight' class='label'>Weight:</label>
+        <div class="control">
+            <input type='number' name='weight' id='weight' required class='input'>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for='email' class='label'>Email:</label>
+        <div class="control">
+            <input type='email' name='email' id='email' required class='input' value="{{user.email}}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Comorbidity</label>
+        <div class="control">
+          <div class="select">
+            <select name='comorbidity' required>
+                {% for test in data %}
+                <option value="{{ test.comorbidity }}">{{ test.comorbidity }}</option>
+                {% endfor %}
+            </select>
+          </div>
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="control">
+            <label class="checkbox">
+            <input type="checkbox">
+            I agree to the <a href="#">terms and conditions</a>
+            </label>
+        </div>
+        </div>
+    <div class="field is-grouped">
+        <div class="control">
+            <button type='submit' class="button is-link">Submit</button>
+        </div>
+        <div class="control">
+            <button class="button is-link is-light">Cancel</button>
+        </div>
+        </div>
+</form>
+{% endif %}
+{%endblock%}
