@@ -20,28 +20,28 @@
             data: {
         datasets: [
             {
-            backgroundColor: ['#ed181f', '#636262'], //[done, left] RED
+            backgroundColor: ['#636262', '#d9d9d9'], //[done, left] Grey
             label: 'Sodium',
             data: [{{sodiumDone}}, {{sodiumLeft}}]
             },
             {
-            backgroundColor: ['#ffb319', '#636262'], // ORANGE
+            backgroundColor: ['#00D0B2', '#d9d9d9'], // Teal
             label: 'Protein',
             data: [{{proteinDone}}, {{proteinLeft}}]
             },
             {
-            backgroundColor: ['#4fed11', '#636262'], // Green
+            backgroundColor: ['#0074DB', '#d9d9d9'], // Blue
             label: 'Water',
             data: [{{waterDone}}, {{waterLeft}}]
 
             },
             {
-            backgroundColor: ['#1b18ed', '#636262'], // BLUE
+            backgroundColor: ['#51C373', '#d9d9d9'], // Green
             label: 'Potassium',
             data: [{{potassiumDone}}, {{potassiumLeft}}]
             },
             {
-            backgroundColor: ['#871aed', '#636262'], //PURPLE
+            backgroundColor: ['#FFDB5A', '#d9d9d9'], //PURPLE
             label: 'Phosphates',
             data: [{{phosphatesDone}}, {{phosphatesLeft}}]
             }
@@ -123,7 +123,7 @@
               <p>{% for i in currUser %}{{i.first_name}}{%endfor%}'s Breakdown</p>
             </div>
             <div class="message-body">
-                {% if sodiumExceed == 1 and proteinExceed == 1 and waterExceed == 1 and potassiumExceed == 1 and phosphatesExceed == 1%}
+                {% if sodiumExceed == 1 or proteinExceed == 1 or waterExceed == 1 or potassiumExceed == 1 or phosphatesExceed == 1%}
                 <h1 class="has-text-left">It looks like you are almost done with your goals! You need more of the following:</h1>
                 {% else %}
                 <h1 class="has-text-left">It looks like you are met or exceeded your goals!</h1>
@@ -132,43 +132,33 @@
                 <ul class="has-text-left">
 
                     {%if sodiumExceed == 1 %}
-                    <li><strong>Sodium</strong></li>
+                    <li>Sodium</li>
                     {% else %}
-                    <script>
-                        // alert('Warning Sodium Daily Value Exceeded')
-                    </script>
+                    <li><strong>Attention - Sodium Daily Value Exceeded</strong></li>
                     {% endif %}
 
                     {%if proteinExceed == 1 %}
-                    <li><strong>Protein</strong></li>
+                    <li>Protein</li>
                     {% else %}
-                    <script>
-                        // alert('Warning Protein Daily Value Exceeded')
-                    </script>
+                    <li><strong>Attention - Protein Daily Value Exceeded</strong></li>
                     {% endif %}
 
                     {% if waterExceed == 1 %}
-                    <li><strong>Water</strong></li>
+                    <li>Water</li>
                     {% else %}
-                    <script>
-                        // alert('Warning Water Daily Value Exceeded')
-                    </script>
+                    <li><strong>Attention - Water Daily Value Exceeded</strong></li>
                     {% endif %}
 
                     {% if potassiumExceed == 1 %}
-                    <li><strong>Potassium</strong></li>
+                    <li>Potassium</li>
                     {% else %}
-                    <script>
-                        // alert('Warning Potassium Daily Value Exceeded')
-                    </script>
+                    <li><strong>Attention - Potassium Daily Value Exceeded</strong></li>
                     {% endif %}
 
                     {% if phosphatesExceed == 1 %}
-                    <li><strong>Phosphates</strong></li>
+                    <li>Phosphates</li>
                     {% else %}
-                    <script>
-                        // alert('Warning Phosphates Daily Value Exceeded')
-                    </script>
+                    <li><strong>Attention - Phosphates Daily Value Exceeded</strong></li>
                     {% endif %}
                 </ul>
             </div>

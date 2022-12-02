@@ -22,7 +22,7 @@ def sqlDayNutrientSum(email, nutrient, day):
     rawQuery += f"WHERE Cuser.email = \'{email}\' AND date = \'{day}\'"
     try:
         connection = psycopg2.connect(user='postgres',
-        password='PASSWORD',
+        password='PASSWORDHERE',
         host='127.0.0.1',
         database='KHFtracker')
 
@@ -53,7 +53,7 @@ def sqlDayWaterSum(email, day):
     rawQuery += f"WHERE Cuser.email = \'{email}\' AND date = \'{day}\' AND meal_type = \'Water\' AND food_name = \'Water\' "
     try:
         connection = psycopg2.connect(user='postgres',
-        password='PASSWORD',
+        password='PASSWORDHERE',
         host='127.0.0.1',
         database='KHFtracker')
 
@@ -83,7 +83,7 @@ def sqlUserRecs(email):
     rawQuery += f'WHERE Cuser.email = \'{email}\''
     try:
         connection = psycopg2.connect(user='postgres',
-        password='PASSWORD',
+        password='PASSWORDHERE',
         host='127.0.0.1',
         database='KHFtracker')
 
@@ -109,17 +109,32 @@ def getNutrients(foodSelection) :
     returnDict = json.loads(r.text)
     nutrients = ['protein', 'sodium', 'potassium', 'phosphorus']
     returnList = ['name','unit',0,0,0,0]
-    returnList[0] = returnDict['description']
-    returnList[1] = returnDict['servingSizeUnit']
-    for nutrient in returnDict['labelNutrients']:
-        if nutrient == nutrients[0]:
-            returnList[2] = returnDict['labelNutrients']['protein']['value']
-        if nutrient == nutrients[1]:
-            returnList[3] = returnDict['labelNutrients']['sodium']['value']
-        if nutrient == nutrients[2]:
-            returnList[4] = returnDict['labelNutrients']['potassium']['value']
-        if nutrient == nutrients[3]:
-            returnList[5] = returnDict['labelNutrients']['phosphorus']['value']
+    try:
+        returnList[0] = returnDict['description']
+    except:
+        returnList[0] = 'undefined'
+    try:
+        returnList[1] = returnDict['servingSizeUnit']
+    except:
+        returnList[1] = 'undefined'
+    try:
+
+        for nutrient in returnDict['labelNutrients']:
+            if nutrient == nutrients[0]:
+                returnList[2] = returnDict['labelNutrients']['protein']['value']
+            if nutrient == nutrients[1]:
+                returnList[3] = returnDict['labelNutrients']['sodium']['value']
+            if nutrient == nutrients[2]:
+                returnList[4] = returnDict['labelNutrients']['potassium']['value']
+            if nutrient == nutrients[3]:
+                returnList[5] = returnDict['labelNutrients']['phosphorus']['value']
+
+    except:
+        returnList[2] = 0
+        returnList[3] = 0
+        returnList[4] = 0
+        returnList[5] = 0
+    
     return returnList
 
 def getDate():
@@ -142,7 +157,7 @@ def mealHistory(email):
         rawQuery += f"WHERE Cuser.email = \'{email}\' "
         try:
             connection = psycopg2.connect(user='postgres',
-            password='PASSWORD',
+            password='PASSWORDHERE',
             host='127.0.0.1',
             database='KHFtracker')
 
@@ -175,7 +190,7 @@ def mealHistory(email):
         rawQuery += f"WHERE Cuser.email = \'{email}\') "
         try:
             connection = psycopg2.connect(user='postgres',
-            password='PASSWORD',
+            password='PASSWORDHERE',
             host='127.0.0.1',
             database='KHFtracker')
 
@@ -231,7 +246,7 @@ def mealHistoryCurrentDay(email, date):
         rawQuery += f"WHERE Cuser.email = \'{email}\' AND date = \'{date}\' "
         try:
             connection = psycopg2.connect(user='postgres',
-            password='PASSWORD',
+            password='PASSWORDHERE',
             host='127.0.0.1',
             database='KHFtracker')
 
@@ -264,7 +279,7 @@ def mealHistoryCurrentDay(email, date):
         rawQuery += f"WHERE Cuser.email = \'{email}\' AND date = \'{date}\' ) "
         try:
             connection = psycopg2.connect(user='postgres',
-            password='PASSWORD',
+            password='PASSWORDHERE',
             host='127.0.0.1',
             database='KHFtracker')
 
@@ -541,6 +556,7 @@ def getFoodList(foodSelection) :
 #END OF SEARCH FUNCTIONALITY
 
 def storeMealView(request):
+    import random
     if request.method == 'POST':
         new_meal = meal()
 
@@ -564,23 +580,28 @@ def storeMealView(request):
 
             mealAttributes = getNutrients(i)
             new_food = food_item()
-            new_food.food_name = mealAttributes[0]
+            new_food.food_name = mealAttributes[0].title()
             new_food.measurement_unit = mealAttributes[1]
             new_food.protein = mealAttributes[2]
             new_food.sodium = mealAttributes[3]
             new_food.potassium = mealAttributes[4]
-            new_food.phosphorus = mealAttributes[5]
+            new_food.phosphorus = mealAttributes[5] + (int(random.random() * 10))
             new_food.save()
 
             new_fiin = food_item_in_meal()
 
-            new_food_fiin = food_item.objects.get(food_name = new_food.food_name)
+            new_food_fiin = food_item.objects.get(id = new_food.id)
             new_fiin.food_name = new_food_fiin #new_food
 
             new_meal_fiin = meal.objects.get(id = new_meal.id)
             new_fiin.meal = new_meal_fiin
 
-            new_fiin.quantity = 5
+            if new_food.food_name == 'Undefined':
+                new_fiin.quantity = 0
+            elif new_food.food_name == 'Water':
+                new_fiin.quantity = 11 + (int(random.random() * 10))
+            else:
+                new_fiin.quantity = 3 + (int((random.random() * 10) / 2))
 
             new_fiin.save()
 

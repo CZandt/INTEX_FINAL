@@ -72,6 +72,8 @@ class food_item(models.Model):
         return(self.food_name)
 
 
+
+
 class food_item_in_meal(models.Model):
     food_name = models.ForeignKey(food_item, on_delete=models.CASCADE)
     meal = models.ForeignKey(meal, on_delete=models.CASCADE)
